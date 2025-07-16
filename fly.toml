@@ -1,3 +1,6 @@
+[build]
+  builtin = "node"
+
 app = "binance-arbitrage-proxy"
 primary_region = "eze"
 
