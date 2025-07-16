@@ -3,45 +3,45 @@ const fetch = require("node-fetch");
 
 const app = express();
 
-const ALLOWED_ASSETS = ["BTC", "ETH", "USDT", "BNB", "SOL"];
+// Lista blanca de pares permitidos
+const validPairs = [
+  "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT",
+  "BTCUSDC", "ETHUSDC", "BNBUSDC", "SOLUSDC",
+  "USDTUSDC"
+];
 
 app.get("/:pair", async (req, res) => {
-    const pair = req.params.pair.toUpperCase();
+  try {
+    const pair = req.params.pair.toUpperCase(); // case insensitive
 
-    // Validar que el par solo contenga las monedas permitidas
-    const isValidPair = ALLOWED_ASSETS.some(asset1 =>
-        ALLOWED_ASSETS.some(asset2 => 
-            pair === `${asset1}${asset2}`
-        )
-    );
-
-    if (!isValidPair) {
-        return res.status(400).json({ 
-            error: `El par ${pair} no está permitido. Solo se aceptan combinaciones entre: ${ALLOWED_ASSETS.join(", ")}` 
-        });
+    if (!validPairs.includes(pair)) {
+      return res.status(400).json({
+        error: `El par ${pair} no está soportado. Pares válidos: ${validPairs.join(", ")}`
+      });
     }
 
-    try {
-        const resp = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${pair}`);
-        const data = await resp.json();
+    const resp = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${pair}`);
+    const data = await resp.json();
 
-        if (data.price) {
-            res.json({ pair: pair, price: data.price });
-        } else {
-            res.status(400).json({ 
-                error: `No se pudo obtener el precio para el par ${pair}`, 
-                response: data 
-            });
-        }
-    } catch (e) {
-        console.error(`Error al llamar a Binance para el par ${pair}:`, e);
-        res.status(500).json({ 
-            error: "Error al obtener el precio desde Binance" 
-        });
+    if (data.price) {
+      res.json({
+        pair,
+        price: data.price,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.status(500).json({
+        error: `No se pudo obtener el precio para el par ${pair}`,
+        response: data
+      });
     }
+  } catch (e) {
+    console.error("Error al llamar a Binance:", e);
+    res.status(500).json({ error: "Error fetching Binance price" });
+  }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en puerto ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
