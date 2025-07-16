@@ -5,8 +5,10 @@ const app = express();
 
 // Lista blanca de pares permitidos
 const validPairs = [
-  "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT",
-  "BTCUSDC", "ETHUSDC", "BNBUSDC", "SOLUSDC",
+  "BTCUSDT", "BTCUSDC", "BTCETH", "BTCBNB", "BTCSOL",
+  "ETHUSDT", "ETHUSDC", "ETHBTC", "ETHBNB", "ETHSOL",
+  "BNBUSDT", "BNBUSDC", "BNBBTC", "BNBETH", "BNBSOL",
+  "SOLUSDT", "SOLUSDC", "SOLBTC", "SOLETH", "SOLBNB",
   "USDTUSDC"
 ];
 
